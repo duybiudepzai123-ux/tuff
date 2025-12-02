@@ -1,43 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>36 Rau Má</title>
+    <title>PS4 Remote PKG Installer - External Links</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background-color: #2c3e50; color: white; }
-        .container { max-width: 600px; margin: auto; padding: 20px; border-radius: 8px; background-color: #34495e; }
-        .button {
-            padding: 12px 25px;
-            font-size: 16px;
+        body { font-family: 'Inter', sans-serif; text-align: center; margin: 0; background-color: #1e293b; color: #f8fafc; }
+        .container { 
+            max-width: 800px; 
+            margin: 40px auto; 
+            padding: 24px; 
+            border-radius: 12px; 
+            background-color: #334155; 
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .game-button {
+            padding: 15px 10px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
             border: none;
-            border-radius: 5px;
-            background-color: #3498db;
+            border-radius: 8px;
+            background-color: #3b82f6; /* Blue 500 */
             color: white;
-            margin: 8px;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px #2563eb; /* Darker blue for shadow */
         }
-        .button:hover { background-color: #2980b9; }
-        .status { margin-top: 20px; padding: 10px; border-radius: 4px; background-color: #2c3e50; }
-        h1 { border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        .warning { color: yellow; font-weight: bold; }
+        .game-button:hover { 
+            background-color: #2563eb; /* Blue 600 */
+            transform: translateY(-1px);
+        }
+        .game-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px #1e40af; /* Even darker blue for press */
+        }
+        .status { margin-top: 20px; padding: 15px; border-radius: 8px; background-color: #1f2937; }
+        h1 { border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-bottom: 20px; }
+        .warning { color: #fcd34d; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1> Chọn Game Cài Đặt (Yêu cầu GoldHEN đã bật)</h1>
-        <p>Vui lòng đảm bảo GoldHEN đã được bật trên PS4 trước khi nhấn nút.</p>
-        
-        <hr style="margin: 20px 0;">
-        
-        <button class="button" onclick="initiateInstall('game_a')">Cài Đặt Game</button>
-        <button class="button" onclick="initiateInstall('game_b')">Cài Đặt Update</button>
-
-        <div id="status-message" class="status">Nothing</div>
+        <h1>🎮 PS4 Remote PKG Installer (7 Games)</h1>
+        <p>Vui lòng đảm bảo **GoldHEN đã được tiêm thành công** trên PS4 trước khi nhấn nút.</p>
         
         <p class="warning" id="mocking-status"></p>
+
+        <div class="game-grid" id="game-list-container">
+            <!-- Các nút sẽ được tạo bởi JavaScript -->
+        </div>
+
+        <div id="status-message" class="status text-lg">Sẵn sàng để gửi lệnh cài đặt.</div>
     </div>
 
     <script>
@@ -46,18 +67,36 @@
         // =========================================================
         
         const API_PORT = 12800; 
-        const PS4_IP = '127.0.0.1'; 
+        const PS4_IP = '127.0.0.1'; // Bắt buộc phải là 127.0.0.1 vì lệnh được gửi từ trình duyệt PS4
         
         // 🚨 CHẾ ĐỘ MÔ PHỎNG (MOCKING) 🚨
         // Đặt = true để test trên PC/Điện thoại. Đặt = false khi test trên PS4 thật.
-        const IS_MOCKING_ENABLED = false; 
+        const IS_MOCKING_ENABLED = true; 
         
         // DANH SÁCH GAME VÀ LINK TẢI TRỰC TIẾP (THAY ĐỔI URL TẠI ĐÂY)
         const gameList = {
-            'game_a': 'https://vikingfile.com/d/5ooDISD2Wu/%5BSuperPSX%5D-eFootball_CUSA26997_v1.39_FULLGAME_%5B9.00%5D_PS4.pkg', // Thay bằng link PKG đã xác nhận
-            'game_b': 'https://vikingfile.com/d/W1wAvJ23VM/%5BSuperPSX%5D-eFootball_CUSA26997_v1.39_BACKPORT_%5B5.05-6.72-7.xx-9.00%5D_PS4.pkg', // Thay bằng link PKG đã xác nhận
+            'game_a': { name: 'PES 2017 Part 1', url: 'http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA04984_00/4/f_c78ab470583d57fedbee36d2c70e6d8fb7889193777ef4a05b1eef11fa9b0efc/f/UP0101-CUSA04984_00-PES2017000000000_0.pkg' },
+            'game_b': { name: 'PES 2017 Part 2', url: 'http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA04984_00/4/f_c78ab470583d57fedbee36d2c70e6d8fb7889193777ef4a05b1eef11fa9b0efc/f/UP0101-CUSA04984_00-PES2017000000000_1.pkg' },
+            'game_c': { name: 'PES 2017 Part 3', url: 'http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA04984_00/4/f_c78ab470583d57fedbee36d2c70e6d8fb7889193777ef4a05b1eef11fa9b0efc/f/UP0101-CUSA04984_00-PES2017000000000_2.pkg' },
+            'game_d': { name: 'PES 2017 Part 4', url: 'http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA04984_00/4/f_c78ab470583d57fedbee36d2c70e6d8fb7889193777ef4a05b1eef11fa9b0efc/f/UP0101-CUSA04984_00-PES2017000000000_3.pkg' },
+            'game_e': { name: 'PES 2017 Part 5', url: 'http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA04984_00/4/f_c78ab470583d57fedbee36d2c70e6d8fb7889193777ef4a05b1eef11fa9b0efc/f/UP0101-CUSA04984_00-PES2017000000000_4.pkg' },
+            'game_f': { name: 'Unravel Two', url: 'http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA10416_00/2/f_7409b329233577b3341f5ac54a317fe4ef7a9c8b7ca94bf90cb45b898b756b94/f/EP0006-CUSA10416_00-COLDWOODPIKE0000.pkg' },
+            'game_g': { name: 'Minecraft Story Mode', url: 'http://gs2.ww.prod.dl.playstation.net/gs2/appkgo/prod/CUSA02463_00/2/f_5feb183cf41980e20626404beb1674e138bb53dc304aca44c5b01ac894d00537/f/EP2026-CUSA02463_00-MSM000000000GAME.pkg' },
         };
         // =========================================================
+        
+        // --- BƯỚC 0: TẠO NÚT TỰ ĐỘNG ---
+        function generateButtons() {
+            const container = document.getElementById('game-list-container');
+            for (const id in gameList) {
+                const game = gameList[id];
+                const button = document.createElement('button');
+                button.className = 'game-button';
+                button.textContent = `Cài ${game.name}`;
+                button.onclick = () => initiateInstall(id);
+                container.appendChild(button);
+            }
+        }
         
         // Hiển thị trạng thái Mocking
         if (IS_MOCKING_ENABLED) {
@@ -65,6 +104,8 @@
         } else {
             document.getElementById('mocking-status').innerText = '';
         }
+        
+        generateButtons(); // Gọi hàm tạo nút khi script tải xong
 
         // --- BƯỚC 1: HÀM MÔ PHỎNG GỬI LỆNH (CHỈ CHẠY KHI TEST) ---
         const originalFetch = window.fetch;
@@ -77,7 +118,7 @@
                 return new Promise(resolve => {
                     setTimeout(() => {
                         const mockResponse = {
-                            ok: true, // Mô phỏng phản hồi HTTP 200 OK
+                            ok: true, 
                             status: 200,
                             text: () => Promise.resolve('{"status":"ok","message":"Command sent successfully"}'),
                         };
@@ -93,7 +134,9 @@
         
         // --- BƯỚC 2: HÀM CHÍNH GỬI LỆNH CÀI ĐẶT ---
         function initiateInstall(gameId) {
-            const PKG_URL = gameList[gameId]; 
+            const gameData = gameList[gameId];
+            const PKG_URL = gameData ? gameData.url : null;
+            const gameName = gameData ? gameData.name : 'Game không xác định';
             const PS4_API_URL = `http://${PS4_IP}:${API_PORT}/api/install`;
 
             if (!PKG_URL) {
@@ -101,11 +144,12 @@
                 return;
             }
             
-            if (!confirm(`Xác nhận cài đặt game/update? (Sẽ tải qua Internet)`)) {
+            // Sử dụng confirm() thay cho alert() để đảm bảo người dùng muốn tiếp tục
+            if (!confirm(`Xác nhận cài đặt game: ${gameName}? (Tải qua Internet)`)) {
                 return; 
             }
 
-            document.getElementById('status-message').innerHTML = '<span style="color:yellow;">Đang gửi lệnh...</span>';
+            document.getElementById('status-message').innerHTML = `<span style="color:#fcd34d;">Đang gửi lệnh cài đặt ${gameName}...</span>`;
 
             const payloadData = { url: PKG_URL };
 
@@ -117,16 +161,16 @@
             .then(response => {
                 if (response.ok) {
                     document.getElementById('status-message').innerHTML = 
-                        `<span style="color:lime;">✅ Lệnh GỬI thành công!</span><br>PS4 đang tải Game từ **Internet**. Kiểm tra mục Notifications.`;
+                        `<span style="color:#10b981;">✅ Lệnh GỬI thành công cho ${gameName}!</span><br>PS4 đang tải Game từ **Internet**. Kiểm tra mục Notifications.`;
                 } else {
                     document.getElementById('status-message').innerHTML = 
-                        `<span style="color:red;">❌ Lỗi ${response.status}: API GoldHEN không phản hồi.</span><br>Vui lòng đảm bảo GoldHEN đã hoạt động và PS4 có Internet.`;
+                        `<span style="color:#ef4444;">❌ Lỗi ${response.status}: API GoldHEN không phản hồi.</span><br>Vui lòng đảm bảo GoldHEN đã hoạt động và PS4 có Internet.`;
                 }
                 return response.text();
             })
             .catch(error => {
                 document.getElementById('status-message').innerHTML = 
-                    `<span style="color:red;">❌ Lỗi kết nối mạng: ${error.message}</span><br>Có thể GoldHEN chưa chạy hoặc xảy ra lỗi mạng.`;
+                    `<span style="color:#ef4444;">❌ Lỗi kết nối mạng: ${error.message}</span><br>Có thể GoldHEN chưa chạy hoặc xảy ra lỗi mạng.`;
             });
         }
     </script>
