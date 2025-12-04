@@ -3,12 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultDiv = document.getElementById('result');
 
     // **Bước 1: Tải dữ liệu Game trực tiếp từ file games.json**
-    // Dùng đường dẫn tương đối (./games.json) để hoạt động trên GitHub Pages
+    // Sử dụng đường dẫn tương đối (./games.json)
     fetch('./games.json')
         .then(response => {
             if (!response.ok) {
-                // Xử lý lỗi nếu file không tìm thấy hoặc lỗi mạng
-                throw new Error('Không thể tải games.json. Vui lòng kiểm tra đường dẫn.');
+                throw new Error('Không thể tải games.json. Vui lòng kiểm tra file và đường dẫn.');
             }
             return response.json();
         })
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 title.textContent = game.name;
                 
                 const button = document.createElement('button');
-                button.textContent = `Tải ngay ${game.name.split(' - ')[0]}`; // Chỉ hiển thị tên game
+                button.textContent = `Tải ngay`;
                 
                 // Gắn sự kiện click
                 button.onclick = () => {
@@ -41,28 +40,26 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => {
             console.error('Lỗi: ', error);
-            resultDiv.innerHTML = `<p style="color: red;">Đã xảy ra lỗi khi tải dữ liệu: ${error.message}</p>`;
+            resultDiv.innerHTML = `<p style="color: red;">⚠️ Đã xảy ra lỗi khi tải dữ liệu: ${error.message}</p>`;
         });
 });
 
 /**
- * Hàm kích hoạt quá trình tải xuống trên trình duyệt PS4.
+ * Hàm kích hoạt quá trình tải xuống. 
+ * Kỹ thuật này dựa vào việc trình duyệt PS4 (sau khi chạy HEN/GoldHEN) 
+ * sẽ tự động giao liên kết .pkg cho Remote Package Installer xử lý.
  * @param {string} pkgUrl - URL PKG trực tiếp.
  * @param {string} gameName - Tên game.
  */
 function initiateDownload(pkgUrl, gameName) {
     const resultDiv = document.getElementById('result');
     
-    // Hiển thị thông báo trước khi chuyển hướng
-    resultDiv.innerHTML = `Đang kích hoạt tải xuống cho **${gameName}**... <br> (Nếu không tự động, vui lòng chờ).`;
+    // 1. Hiển thị thông báo
+    resultDiv.innerHTML = `Đang kích hoạt tải xuống cho **${gameName}**... <br> Vui lòng theo dõi thông báo trên màn hình PS4.`;
     
-    // **Bước 3: Chuyển hướng trình duyệt PS4**
-    // Lệnh này sẽ chuyển hướng trình duyệt PS4 đến URL PKG. 
-    // Nếu PS4 đã được chuẩn bị (exploit), nó sẽ bắt đầu tải xuống và cài đặt.
+    // 2. Kích hoạt RPI bằng cách Chuyển hướng
+    // Đây là bước quan trọng nhất: Chuyển hướng đến URL .pkg trực tiếp.
     window.location.href = pkgUrl;
     
-    // Tùy chọn: Thay vì chuyển hướng, bạn có thể chỉ hiển thị một liên kết:
-    /*
-    resultDiv.innerHTML = `Vui lòng nhấp vào liên kết sau trên trình duyệt PS4 để bắt đầu tải: <br> <a href="${pkgUrl}" target="_blank">Tải ${gameName}</a>`;
-    */
+    // Chức năng này yêu cầu người dùng đã chạy HEN/GoldHEN trước khi truy cập trang web.
 }
