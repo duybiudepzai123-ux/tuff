@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // **Bước 1: Tải dữ liệu Game trực tiếp từ file games.json**
     // Sử dụng đường dẫn tương đối (./games.json)
-    fetch('./games.json')
+    fetch('./backend/games.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Không thể tải games.json. Vui lòng kiểm tra file và đường dẫn.');
