@@ -2,12 +2,11 @@
     {
         "id": "game001",
         "name": "MONSTER PATCH 2026",
-        "pkg_url": "https://vikingfile.com/d/E2sVApZQGT/MONSTER%20PATCH%202026%20-%20DP%207.02%20-%20CUSA18676.pkg" 
+        "pkg_url": "https://vikingfile.com/d/E2sVApZQGT/MONSTER%20PATCH%202026%20-%20DP%207.02%20-%20CUSA18676.pkg"
     },
     {
         "id": "game002",
         "name": "Game Ví Dụ B",
-        "pkg_url": "http://SERVER_CUA_BAN/link/game-b.pkg" 
+        "pkg_url": "http://SERVER_CUA_BAN/link/game-b.pkg"
     }
-    // Thêm các game khác vào đây...
 ]
